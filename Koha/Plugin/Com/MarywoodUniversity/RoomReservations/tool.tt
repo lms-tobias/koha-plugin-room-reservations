@@ -4,16 +4,34 @@
     <title>[% "Koha: Room Reservations Plugin: Configuration" | gettext %]</title>
 [% INCLUDE 'doc-head-close.inc' %]
     <style type="text/css">
-        .fieldset-auto-width {
-            display: inline-block;
-        }
-
+		#doc {
+			margin-top: 20px;
+		}
+		table {
+			margin: 15px 0;
+			width: 100%;
+		}
         .table-header-bold {
             font-weight: bold;
         }
         .table-row-centered {
             text-align: center;
         }
+		#partial-blackout table td {
+			padding-left: 60px;
+		}
+		#full-blackout table td {
+			padding-left: 60px;
+		}
+		table td {
+			vertical-align: middle;
+		}
+		.fieldset-auto-width {
+			display: inline-block;
+		}
+		div.alert {
+			background: #FFFFCC;
+		}
         button {
             background:none!important;
             color:#0000EE;
@@ -36,10 +54,10 @@
 
 <div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">[% 'Home' | gettext%]</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">[% 'Plugins' | gettext %]</a> &rsaquo; [% 'Room Reservations' %] &rsaquo; [% 'Tool' %]</div>
 
-<div id="doc3">
+<div id="doc">
 
 	<!-- We can access our own plugins resource files using the PLUGIN_PATH variable. -->
-    <h3>[% 'Koha: Room Reservations Plugin: Tool' | gettext %]</h3>
+    <h1>[% 'Koha: Room Reservations Plugin: Tool' | gettext %]</h1>
 
     [% IF op == '' %]
     <script type="text/javascript">
@@ -57,7 +75,7 @@
         <input type="hidden" name="method" value="[% METHOD %]" />
         <input type="hidden" name="op" value="action-selected" />
 
-        <fieldset class="fieldset-auto-width">
+        <fieldset>
         	<legend>[% 'Actions' | gettext %]</legend>
         		<div>
         			[% 'Select an action:' | gettext %]
@@ -120,7 +138,7 @@
         }
     </script>
     <!-- TODO: add JS validation to check only one action item is selected - if (count > 1) -->
-    <form name="manageBookingsForm" method="post" action="#" onsubmit="return validateBookingAction()">
+    <form name="manageBookingsForm" method="post" action="#" onsubmit="return validateBookingAction()" style="width: inherit;">
     	<input type="hidden" name="class" value="[% CLASS %]" />
         <input type="hidden" name="method" value="[% METHOD %]" />
 	    <input type="hidden" name="op" value="manage-reservations" />
@@ -159,7 +177,7 @@
             	</tr>
             	[% END # FOREACH booking IN bookings %]
             	<tr>
-            		<td colspan="5">
+            		<td colspan="5" style="text-align: center;">
             			<select name="manage-bookings-action">
                         	<option value="">[% 'Actions' | gettext %]</option>
                         	<option value="delete">[% 'Delete' | gettext %]</option>
@@ -256,9 +274,9 @@
     <br />
 
     <div id="b-selection">
-        <fieldset class="fieldset-auto-width">
+        <fieldset>
             <legend>[% 'Add a blackout' | gettext %]</legend>
-            <table>
+            <table style="width: 50%;">
                 <tr style="text-align: center;">
                     <td>[% 'How long is the blackout?' | gettext %]</td>
                 </tr>
@@ -386,9 +404,9 @@
         <input type="hidden" name="class" value="[% CLASS %]" />
         <input type="hidden" name="method" value="[% METHOD %]" />
         <input type="hidden" name="op" value="manage-blackouts" />
-        <fieldset class="fieldset-auto-width">
+        <fieldset>
             <legend>[% 'Add a blackout' | gettext %]</legend>
-            <table>
+            <table style="width: 50%;">
                 <tr>
                     <td>
                         <input class="datefield" name="blackout-start-date" id="blackout-start-date" size="10" placeholder="[% 'Start' | gettext %]" required="required" />
@@ -487,9 +505,9 @@
         <input type="hidden" name="class" value="[% CLASS %]" />
         <input type="hidden" name="method" value="[% METHOD %]" />
         <input type="hidden" name="op" value="manage-blackouts" />
-        <fieldset class="fieldset-auto-width">
+        <fieldset>
             <legend>[% 'Add a blackout' | gettext %]</legend>
-            <table>
+            <table style="width: 50%;">
                 <tr>
                     <td>
                         <input class ="datefield" name="blackout-date" id="blackout-date" size="10" placeholder="Date" />
