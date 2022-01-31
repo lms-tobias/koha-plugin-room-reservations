@@ -408,6 +408,7 @@ elsif( $op eq 'reservation-confirmed' ) {
         # KohaAdmin address is the default - no need to set
         my %mail = $email->create_message_headers({
             to => $patronEmail,
+            cc => $user_email,
         });
         $mail{'X-Abuse-Report'} = C4::Context->preference('KohaAdminEmailAddress');
 
@@ -811,7 +812,7 @@ sub checkRoomAvailability {
         SELECT roomid
             FROM $bookings_table
             WHERE
-            \'$end\' > start AND \'$start\' < end;
+            \'$end\' > start AND \'$start\' < end AND room_id = \'$room_id\';
             ";
             
     
