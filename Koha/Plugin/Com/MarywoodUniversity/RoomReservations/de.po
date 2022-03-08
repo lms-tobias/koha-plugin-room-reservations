@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2021-09-03 16:31+0200\n"
+"PO-Revision-Date: 2022-03-08 15:49+0100\n"
 "Last-Translator: root <root@56ee6f0bd7d1>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -1004,7 +1004,7 @@ msgstr "Bitte eine gültige Start- und Endzeit eingeben!"
 
 #: opac/calendar-sendconfirmation.tt:6
 msgid "Study Room Reservation Confirmation"
-msgstr "Raumreservierungsbestättigung"
+msgstr "Raumreservierungsbestätigung"
 
 #: opac/calendar-sendconfirmation.tt:12
 msgid "Your study room request has been completed!"

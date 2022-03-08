@@ -67,6 +67,7 @@
         <div class="container-fluid">
             <div class="row-fluid">
 				<div class="span3">
+					admin_confirmation_email: [% admin_confirmation_email %] <br>
 					<h2>[% 'Available Rooms' | gettext %]</h2>
 					[% FOR room IN rooms %]
 					<div class="ui-tabs ui-widget ui-widget-content ui-corner-all">
@@ -318,7 +319,7 @@
 							
 							<div class="headcount-selection">
 								<h3>[% 'Select Room' | gettext %]</h3>
-								<select name="availability-search-room">
+								<select name="availability-search-room" id="availability-search-room">
 									<option value=""></option>
 									[% FOREACH room IN rooms %]
 										<option value="[% room.roomid %]">[% room.roomnumber %] ([% 'max.' | gettext %] [% room.maxcapacity %] [% 'people' | gettext %])</option>
