@@ -4,23 +4,7 @@
     <title>[% "Koha: Room Reservations Plugin: Configuration" | gettext %]</title>
 [% INCLUDE 'doc-head-close.inc' %]
     <style type="text/css">
-
-        div#doc3 > form, 
-        div#doc3 > div {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            width: 50%;
-            margin: 0 auto;
-        }
-
-        div#doc3 > h3 {
-            margin: 0.5em 0.8em;
-        }
-
         .fieldset-auto-width {
-            text-align: center;
             display: inline-block;
         }
 
@@ -396,7 +380,7 @@
             var actionChoice = document.forms["manageBlackoutsForm"]["manage-blackouts-action"].value;
 
             if (actionChoice == "") {
-                alert("[% 'Please select an action.' | gettext %]");
+                alert('[% 'Please select an action.' | gettext %]');
                 return false;
             }
         }

@@ -1,6 +1,3 @@
 node_modules
 Koha.tar.gz
 Koha.zip
-.vscode/
-
-package-lock.json
