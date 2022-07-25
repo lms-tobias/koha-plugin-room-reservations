@@ -395,7 +395,7 @@
                 }
                 else {
                     if ( !roomChecked ) {
-                        alert('[% 'Select a room to continue.' | gettext %]');
+                        alert("[% 'Select a room to continue.' | gettext %]");
                         return false;
                     }
                 }
@@ -534,6 +534,7 @@
     [% ELSIF op == 'reservation-confirmed' %]
 
         [% IF invalid_booking == 1 %]
+            <script>console.log('invalid booking')</script>
             <h1>[% 'Sorry!' | gettext %]</h1>
             <br />
             <h2>[% 'It appears there was a problem completing your reservation' | gettext %]
@@ -546,6 +547,7 @@
                 <button>[% 'Click here to search again' | gettext %]</button>
             </form>
         [% ELSE %]
+            <script>console.log('invalid booking')</script>
             <h1>[% 'Congratulations! Your reservation is confirmed!' | gettext %]</h1>
             <br />
             [% IF SENT == '1' %]

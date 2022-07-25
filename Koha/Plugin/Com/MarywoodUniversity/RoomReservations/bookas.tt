@@ -320,7 +320,7 @@
                 }
                 else {
                     if ( !roomChecked ) {
-                        alert('[% 'Select a room to continue.' | gettext %]');
+                        alert("[% 'Select a room to continue.' | gettext %]");
                         return false;
                     }
                 }
@@ -412,7 +412,7 @@
                 <!-- Checked by default -->
                 <!-- Checked by default -->
                     <p>
-						<input type="checkbox" id="send-confirmation-copy" name="send-confirmation-copy" value="1" checked> 
+						<input type="checkbox" id="send-confirmation-copy" name="send-confirmation-copy" value="1" [% IF current_user_email %] checked [% ELSE %] disabled [% END %]> 
 						<label for="send-confirmation-copy">[% 'Send a copy as confirmation' | gettext %]</label>
 					</p>
                 [% END # IF Koha.Preference('KohaAdminEmailAddress') %]
@@ -457,28 +457,3 @@
 
 
 [% INCLUDE 'intranet-bottom.inc' %]
-[% INCLUDE calendar.inc %]
-<script type="text/javascript">
-// <![CDATA[
-
-    $(document).ready(function() {
-        $(".datefield").prop("readOnly", true);
-    });
-
-    // http://jqueryui.com/demos/datepicker/#date-range
-    var requestdates = $( "#availability-search-start-date, #availability-search-end-date" ).datepicker({
-        minDate: 0,
-        changeMonth: true,
-        numberOfMonths: 1,
-        onSelect: function( selectedDate ) {
-            var option = this.id == "availability-search-start-date" ? "minDate" : "maxDate",
-                instance = $( this ).data( "datepicker" );
-                date = $.datepicker.parseDate(
-                    instance.settings.dateFormat ||
-                    $.datepicker._defaults.dateFormat,
-                    selectedDate, instance.settings );
-            requestdates.not( this ).datepicker("option", option, date);
-        }
-    });
-// ]]>
-</script>

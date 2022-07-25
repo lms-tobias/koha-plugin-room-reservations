@@ -384,7 +384,7 @@ elsif( $op eq 'reservation-confirmed' ) {
     
     my $admin_confirmation_email = C4::Context->preference('RoomBookingConfirmationEMail');
 
-    if ( $startOverButton ne '' ) {
+    if ( defined $startOverButton && $startOverButton ne '' ) {
 
         $op = 'availability-search';
     }
@@ -409,7 +409,7 @@ elsif( $op eq 'reservation-confirmed' ) {
         
 
         # KohaAdmin address is the default - no need to set
-        my %mail = $email->create_message_headers({
+        my %mail = $email->create({
             to => $admin_confirmation_email,
         });
         $mail{'X-Abuse-Report'} = C4::Context->preference('KohaAdminEmailAddress');
@@ -516,13 +516,13 @@ END_OF_BODY
         op => $op,
     );    
 
-    if ( $sendCopy eq '1' && $valid ) {
+    if ( $sendCopy eq '1' && $valid && defined $patronEmail && $patronEmail ne '' ) {
 
         my $email = Koha::Email->new();
         my $user_email = C4::Context->preference('KohaAdminEmailAddress');
 
         # KohaAdmin address is the default - no need to set
-        my %mail = $email->create_message_headers({
+        my %mail = $email->create({
             to => $patronEmail,
         });
         $mail{'X-Abuse-Report'} = C4::Context->preference('KohaAdminEmailAddress');
