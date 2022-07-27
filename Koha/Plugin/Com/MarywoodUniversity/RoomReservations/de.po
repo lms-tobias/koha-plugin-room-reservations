@@ -1095,6 +1095,10 @@ msgstr "Sa"
 msgid "Book a Room"
 msgstr "Einen Raum buchen"
 
+#: opac/calendar.tt:202 opac/calendar.tt:412 
+msgid "Persons"
+msgstr "Personen"
+
 #: opac/calendar.tt:294
 msgid "Book a room"
 msgstr "Einen Raum buchen"
