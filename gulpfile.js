@@ -13,15 +13,14 @@ const release_filename = `${package_json.name}-v${package_json.version}.kpz`;
 const pm_file = 'RoomReservations.pm';
 const pm_file_path = 'Koha/Plugin/Com/MarywoodUniversity/';
 const pm_file_path_full = pm_file_path + pm_file;
-const pm_file_path_dist = 'dist/' + pm_file_path;
+const pm_file_path_dist = `dist/${pm_file_path}`;
 const pm_file_path_full_dist = pm_file_path_dist + pm_file;
 
 console.log(release_filename);
 console.log(pm_file_path_full_dist);
 
-gulp.task('build', () => {
-    return new Promise((resolve) => {
-        run(`
+gulp.task('build', () => new Promise((resolve) => {
+  run(`
             mkdir dist ;
             cp -r Koha dist/. ;
             sed -i -e "s/{VERSION}/${package_json.version}/g" ${pm_file_path_full_dist} ;
@@ -31,13 +30,12 @@ gulp.task('build', () => {
             cd .. ;
             rm -rf dist ;
         `).exec();
-        resolve();
-    });
-});
+  resolve();
+}));
 
 gulp.task('release', () => {
-    gulp.src(release_filename)
-        .pipe(release({
-            manifest: require('./package.json') // package.json from which default values will be extracted if they're missing
-        }));
+  gulp.src(release_filename)
+    .pipe(release({
+      manifest: require('./package.json'), // package.json from which default values will be extracted if they're missing
+    }));
 });

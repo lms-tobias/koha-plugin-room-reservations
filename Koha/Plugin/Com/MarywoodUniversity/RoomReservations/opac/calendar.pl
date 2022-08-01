@@ -35,6 +35,7 @@ use File::Basename qw( dirname );
 use POSIX 'strftime';
 use POSIX 'floor';
 use DateTime;
+use Data::Dumper;
 
 use CGI qw ( -utf8 );
 
@@ -181,22 +182,13 @@ if ( !defined($op) ) {
     );
 }
 elsif ( $op eq 'availability-search' ) {
-
-    my $equipment = loadAllEquipment();
-
-    my $rooms = getAllRoomsWithEquipment();
-
+    my $equipment    = loadAllEquipment();
+    my $rooms        = getAllRoomsWithEquipment();
     my $max_num_days = getFutureDays() || '0';
+    my $max_time     = getMaxTime()    || '0';
 
-    my $max_time = getMaxTime() || '0';
-
-    if ( $max_num_days eq '0' ) {
-        $max_num_days = '';
-    }
-
-    if ( $max_time eq '0' ) {
-        $max_time = '';
-    }
+    if ( $max_num_days eq '0' ) { $max_num_days = ''; }
+    if ( $max_time eq '0' )     { $max_time     = ''; }
 
     my $submitCheckRoomAvailability = $cgi->param('submit-check-room-availability') || q{};
 
@@ -407,12 +399,14 @@ elsif ( $op eq 'reservation-confirmed' ) {
 
     if ( defined $admin_confirmation_email && $admin_confirmation_email ne '' && $valid ) {
 
-        my $email      = Koha::Email->new();
         my $user_email = C4::Context->preference('KohaAdminEmailAddress');
 
         # KohaAdmin address is the default - no need to set
-        my %mail = $email->create( { to => $admin_confirmation_email, } );
-        $mail{'X-Abuse-Report'} = C4::Context->preference('KohaAdminEmailAddress');
+
+        warn Dumper(qq{admin_confirmation_email: $user_email});    #FIXME: remove
+
+        my $mail = Koha::Email->create( { to => $user_email, } );
+        $mail->{'X-Abuse-Report'} = C4::Context->preference('KohaAdminEmailAddress');
 
         # Since we are already logged in, no need to check credentials again
         # when loading a second template.
@@ -436,48 +430,48 @@ elsif ( $op eq 'reservation-confirmed' ) {
 
         # Analysing information and getting mail properties
 
-        if ( $template_res =~ /<SUBJECT>(.*)<END_SUBJECT>/s ) {
-            $mail{subject} = $1;
-            $mail{subject} =~ s|\n?(.*)\n?|$1|;
-            $mail{subject} = Encode::encode( "UTF-8", $mail{subject} );
+        if ( $template_res =~ /<SUBJECT>(.*)<END_SUBJECT>/xs ) {
+            $mail->{'subject'} = $1;
+            $mail->{'subject'} =~ s|\n?(.*)\n?|$1|x;
+            $mail->{'subject'} = Encode::encode( "UTF-8", $mail->{'subject'} );
         }
-        else { $mail{'subject'} = "no subject"; }
+        else { $mail->{'subject'} = 'no subject'; }
 
         my $email_header = "";
 
-        if ( $template_res =~ /<HEADER>(.*)<END_HEADER>/s ) {
+        if ( $template_res =~ /<HEADER>(.*)<END_HEADER>/xs ) {
             $email_header = $1;
-            $email_header =~ s|\n?(.*)\n?|$1|;
+            $email_header =~ s|\n?(.*)\n?|$1|x;
             $email_header = encode_qp( Encode::encode( "UTF-8", $email_header ) );
         }
 
         my $email_file = "bookingconfirmation.txt";
-        if ( $template_res =~ /<FILENAME>(.*)<END_FILENAME>/s ) {
+        if ( $template_res =~ /<FILENAME>(.*)<END_FILENAME>/xs ) {
             $email_file = $1;
-            $email_file =~ s|\n?(.*)\n?|$1|;
+            $email_file =~ s|\n?(.*)\n?|$1|x;
         }
 
-        if ( $template_res =~ /<MESSAGE>(.*)<END_MESSAGE>/s ) {
+        if ( $template_res =~ /<MESSAGE>(.*)<END_MESSAGE>/xs ) {
             $body = $1;
-            $body =~ s|\n?(.*)\n?|$1|;
+            $body =~ s|\n?(.*)\n?|$1|x;
             $body = encode_qp( Encode::encode( "UTF-8", $body ) );
         }
 
-        $mail{body} = $body;
+        $mail->{'text_body'} = $body;
 
         my $boundary = "====" . time() . "====";
 
-        $mail{'content-type'} = "multipart/mixed; boundary=\"$boundary\"";
-        $boundary             = '--' . $boundary;
-        $mail{body}           = <<END_OF_BODY;
-$boundary
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-$email_header
-$body
-$boundary--
-END_OF_BODY
+        $mail->{'body_params'} = { contenttype => qq{multipart/mixed; boundary=\"$boundary\"} };
+        $boundary = '--' . $boundary;
+        $mail->{'text_body'} = <<~END_OF_BODY;
+            $boundary
+            MIME-Version: 1.0
+            Content-Type: text/plain; charset="UTF-8"
+            Content-Transfer-Encoding: quoted-printable
+            $email_header
+            $body
+            $boundary--
+            END_OF_BODY
 
 ## This version includes file attachment (if necessary)
         # $boundary
@@ -495,7 +489,7 @@ END_OF_BODY
         # END_OF_BODY
 
         # Sending mail (if not empty basket)
-        if ( sendmail %mail ) {
+        if ( $mail->send_or_die() ) {
 
             # do something if it works....
             $template->param(
@@ -515,12 +509,13 @@ END_OF_BODY
 
     if ( $sendCopy eq '1' && $valid && defined $patronEmail && $patronEmail ne '' ) {
 
-        my $email      = Koha::Email->new();
         my $user_email = C4::Context->preference('KohaAdminEmailAddress');
 
+        warn Dumper(qq{patron_email: $patronEmail});
+
         # KohaAdmin address is the default - no need to set
-        my %mail = $email->create( { to => $patronEmail, } );
-        $mail{'X-Abuse-Report'} = C4::Context->preference('KohaAdminEmailAddress');
+        my $mail = Koha::Email->create( { to => $patronEmail, } );
+        # $mail->{'X-Abuse-Report'} = C4::Context->preference('KohaAdminEmailAddress');
 
         # Since we are already logged in, no need to check credentials again
         # when loading a second template.
@@ -544,48 +539,48 @@ END_OF_BODY
 
         # Analysing information and getting mail properties
 
-        if ( $template_res =~ /<SUBJECT>(.*)<END_SUBJECT>/s ) {
-            $mail{subject} = $1;
-            $mail{subject} =~ s|\n?(.*)\n?|$1|;
-            $mail{subject} = Encode::encode( "UTF-8", $mail{subject} );
+        if ( $template_res =~ /<SUBJECT>(.*)<END_SUBJECT>/xs ) {
+            $mail->{'subject'} = $1;
+            $mail->{'subject'} =~ s|\n?(.*)\n?|$1|x;
+            $mail->{'subject'} = Encode::encode( "UTF-8", $mail->{'subject'} );
         }
-        else { $mail{'subject'} = "no subject"; }
+        else { $mail->{'subject'} = 'no subject'; }
 
         my $email_header = "";
 
-        if ( $template_res =~ /<HEADER>(.*)<END_HEADER>/s ) {
+        if ( $template_res =~ /<HEADER>(.*)<END_HEADER>/xs ) {
             $email_header = $1;
-            $email_header =~ s|\n?(.*)\n?|$1|;
+            $email_header =~ s|\n?(.*)\n?|$1|x;
             $email_header = encode_qp( Encode::encode( "UTF-8", $email_header ) );
         }
 
         my $email_file = "bookingconfirmation.txt";
-        if ( $template_res =~ /<FILENAME>(.*)<END_FILENAME>/s ) {
+        if ( $template_res =~ /<FILENAME>(.*)<END_FILENAME>/xs ) {
             $email_file = $1;
-            $email_file =~ s|\n?(.*)\n?|$1|;
+            $email_file =~ s|\n?(.*)\n?|$1|x;
         }
 
-        if ( $template_res =~ /<MESSAGE>(.*)<END_MESSAGE>/s ) {
+        if ( $template_res =~ /<MESSAGE>(.*)<END_MESSAGE>/xs ) {
             $body = $1;
-            $body =~ s|\n?(.*)\n?|$1|;
+            $body =~ s|\n?(.*)\n?|$1|x;
             $body = encode_qp( Encode::encode( "UTF-8", $body ) );
         }
 
-        $mail{body} = $body;
+        $mail->{'text_body'} = $body;
 
         my $boundary = "====" . time() . "====";
 
-        $mail{'content-type'} = "multipart/mixed; boundary=\"$boundary\"";
-        $boundary             = '--' . $boundary;
-        $mail{body}           = <<END_OF_BODY;
-$boundary
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-$email_header
-$body
-$boundary--
-END_OF_BODY
+        $mail->{'body_params'} = { contenttype => qq{multipart/mixed; boundary=\"$boundary\"} };
+        $boundary               = '--' . $boundary;
+        $mail->{'text_body'}    = <<~END_OF_BODY;
+            $boundary
+            MIME-Version: 1.0
+            Content-Type: text/plain; charset="UTF-8"
+            Content-Transfer-Encoding: quoted-printable
+            $email_header
+            $body
+            $boundary--
+            END_OF_BODY
 
 ## This version includes file attachment (if necessary)
         # $boundary
@@ -603,7 +598,7 @@ END_OF_BODY
         # END_OF_BODY
 
         # Sending mail (if not empty basket)
-        if ( sendmail %mail ) {
+        if ( $mail->send_or_die() ) {
 
             # do something if it works....
             $template->param(
@@ -1085,13 +1080,13 @@ sub getAllRoomsWithEquipment {
 
     while ( my $row = $sth->fetchrow_hashref() ) {
         my $roomid = $row->{roomid};
-        $query = "
-			SELECT equipmentname 
+        $query = qq{
+            SELECT equipmentname 
 			FROM $equipment_table AS e 
 			LEFT JOIN $roomequipment_table as re ON e.equipmentid = re.equipmentid 
 			LEFT JOIN $rooms_table AS r ON re.roomid = r.roomid
 			WHERE r.roomid = $roomid;
-		";
+        };
         $sth2 = $dbh->prepare($query);
         $sth2->execute();
         my @equipment;

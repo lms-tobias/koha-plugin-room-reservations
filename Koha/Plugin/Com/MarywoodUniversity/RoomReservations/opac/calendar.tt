@@ -99,10 +99,11 @@
   }
 
   .lmsr-calendar-data-booking {
-    margin: 0.25em;
+    margin: 0.5em 2.5em 0.5em 0.5em;
     border-radius: 7px;
-    padding: 0.25em 1.75em 0.25em 0.25em;
+    padding: 0.25em;
     font-size: small;
+    text-align: center;
   }
 
   .lmsr-calendar-data {
@@ -265,13 +266,13 @@
               </div>
               <hr class="lmsr-calendar-vertical-seperator">
               <div class="lmsr-calendar-row">
-                <span class="lmsr-calendar-header">[% 'SUN' | gettext %]</span>
                 <span class="lmsr-calendar-header">[% 'MON' | gettext %]</span>
                 <span class="lmsr-calendar-header">[% 'TUE' | gettext %]</span>
                 <span class="lmsr-calendar-header">[% 'WED' | gettext %]</span>
                 <span class="lmsr-calendar-header">[% 'THU' | gettext %]</span>
                 <span class="lmsr-calendar-header">[% 'FRI' | gettext %]</span>
                 <span class="lmsr-calendar-header">[% 'SAT' | gettext %]</span>
+                <span class="lmsr-calendar-header">[% 'SUN' | gettext %]</span>
               </div>
             </div>
             <div class="lmsr-calendar-body">
@@ -327,6 +328,38 @@
         });
 
         jumpToCalendarButton.disabled = false;
+
+        /* We could think about assigning dedicated configurable colors to these. */
+        const activeBookingsInCalendar = document.querySelectorAll(
+          '.lmsr-calendar-data-booking',
+        );
+
+        const getColorTextWithContrast = (element) => {
+          const ELEMENT_REFERENCE = element;
+          // Generate random RGB values
+          const red = Math.floor(Math.random() * 256 - 1);
+          const green = Math.floor(Math.random() * 256 - 1);
+          const blue = Math.floor(Math.random() * 256 - 1);
+
+          // Calculate brightness of randomized colour
+          const brightness = (red * 299 + green * 587 + blue * 114) / 1000;
+
+          // Calculate brightness of white and black text
+          const lightText = (255 * 299 + 255 * 587 + 255 * 114) / 1000;
+          const darkText = (0 * 299 + 0 * 587 + 0 * 114) / 1000;
+
+          const backgroundColor = `rgb(${red},${green},${blue})`;
+          const textColor = Math.abs(brightness - lightText) > Math.abs(brightness - darkText) ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)';
+
+          return [backgroundColor, textColor];
+        };
+
+        activeBookingsInCalendar.forEach((activeBookingInCalendar) => {
+          const ACTIVE_BOOKING_REFERENCE = activeBookingInCalendar;
+          const [backgroundColor, textColor] = getColorTextWithContrast();
+          ACTIVE_BOOKING_REFERENCE.style.backgroundColor = backgroundColor;
+          ACTIVE_BOOKING_REFERENCE.style.color = textColor;
+        });
       </script>
     </div>
     <!-- / .container-fluid -->
@@ -523,9 +556,9 @@
           const MINUTES_TO_MILLISECONDS = 60000;
           const MILLISECONDS_TO_HOURS = 3600000;
 
-          const maximumTimeframe = parseInt(document.getElementById('max_time').value);
-          const maximumTimeframeInMilliseconds = maximumTimeframe !== 0 ? maximumTimeframe * MINUTES_TO_MILLISECONDS : 0;
-          const maximumTimeframeInHours = maximumTimeframeInMilliseconds !== 0 ? (maximumTimeframeInMilliseconds / MILLISECONDS_TO_HOURS) % 24 : 0;
+          const maximumBookableTimeframe = parseInt(document.getElementById('max_time').value);
+          const maximumBookableTimeframeInMilliseconds = maximumBookableTimeframe !== 0 ? maximumBookableTimeframe * MINUTES_TO_MILLISECONDS : 0;
+          const maximumBookableTimeframeInHours = maximumBookableTimeframeInMilliseconds !== 0 ? (maximumBookableTimeframeInMilliseconds / MILLISECONDS_TO_HOURS) % 24 : 0;
 
           const startTimestamp = `${searchForm.sd.value} ${searchForm.st.value}`;
           const endTimestamp = `${searchForm.ed.value} ${searchForm.et.value}`;
@@ -536,13 +569,13 @@
           const timeDifferenceInMilliseconds = endTimestampInMilliseconds - startTimestampInMilliseconds;
 
           if (
-            timeDifferenceInMilliseconds > maximumTimeframeInMilliseconds &&
-            maximumTimeframeInMilliseconds > 0
+            timeDifferenceInMilliseconds > maximumBookableTimeframeInMilliseconds &&
+            maximumBookableTimeframeInMilliseconds > 0
           ) {
             let timeString = '';
 
-            if (maximumTimeframeInHours > 0) {
-              timeString += `${maximumTimeframeInHours} [% 'hours' | gettext %]`;
+            if (maximumBookableTimeframeInHours > 0) {
+              timeString += `${maximumBookableTimeframeInHours} [% 'hours' | gettext %]`;
             }
 
             e.preventDefault();
